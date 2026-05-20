@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Predict - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Traffic Analysis</h2>
+
+        <!-- Upload Section -->
+        <div class="card upload-card">
+            <h3>Upload Traffic Data</h3>
+            <div class="drag-drop-box" id="dragDropBox">
+                <div class="drag-drop-content">
+                    <div class="drag-drop-icon">📁</div>
+                    <p><strong>Drag and drop</strong> your file here or <strong>click to browse</strong></p>
+                    <p style="font-size: 0.9em; color: #94a3b8;">Supported: .csv, .txt (NSL-KDD format, 41 features)</p>
+                </div>
+                <input type="file" id="fileInput" accept=".csv,.txt" style="display: none;">
+            </div>
+            <div id="fileName" style="margin-top: 12px; text-align: center; color: #38bdf8; display: none;"></div>
+            <button class="btn btn-primary" id="analyzeBtn" style="width: 100%; margin-top: 16px; display: none;">
+                Analyse Traffic
+            </button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+            <p>Scanning traffic records...</p>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div id="resultsSection" style="display: none;">
+            
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Total Records</div>
+                    <div class="summary-value" id="totalRecords">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Normal</div>
+                    <div class="summary-value" id="normalCount" style="color: #22c55e;">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Attacks</div>
+                    <div class="summary-value" id="attackCount" style="color: #ef4444;">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Avg Confidence</div>
+                    <div class="summary-value" id="avgConfidence">0%</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="card chart-container">
+                    <h3>Attack Distribution</h3>
+                    <canvas id="attackChart"></canvas>
+                </div>
+                <div class="card chart-container">
+                    <h3>Category Breakdown</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Severity Breakdown -->
+            <div class="severity-grid">
+                <div class="severity-card high">
+                    <div class="severity-icon">🔴</div>
+                    <div class="severity-label">High Threats</div>
+                    <div class="severity-count" id="highCount">0</div>
+                </div>
+                <div class="severity-card medium">
+                    <div class="severity-icon">🟠</div>
+                    <div class="severity-label">Medium Threats</div>
+                    <div class="severity-count" id="mediumCount">0</div>
+                </div>
+                <div class="severity-card low">
+                    <div class="severity-icon">🟡</div>
+                    <div class="severity-label">Low Threats</div>
+                    <div class="severity-count" id="lowCount">0</div>
+                </div>
+            </div>
+
+            <!-- Alert Box -->
+            <div id="alertBox" class="card alert-box" style="margin-top: 24px;">
+                <!-- Alert will be inserted here -->
+            </div>
+
+            <!-- Prediction Table -->
+            <div class="card table-card">
+                <h3>Detailed Predictions</h3>
+                
+                <div class="table-controls">
+                    <input type="text" id="searchBox" class="search-input" placeholder="Search by prediction or category...">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="attacksOnlyFilter">
+                        <span>Show Attacks Only</span>
+                    </label>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="predictions-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Prediction</th>
+                                <th>Confidence</th>
+                                <th>Category</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictionsBody">
+                            <!-- Rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <!-- Pagination will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <button class="btn btn-primary" id="downloadBtn" style="width: 100%; margin-top: 24px;">
+                ⬇️ Download Results as CSV
+            </button>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+{% endblock %}

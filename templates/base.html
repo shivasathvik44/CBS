@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Cloud Security - IDS{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        // Apply persisted theme before paint to avoid a flash
+        (function() {
+            try {
+                var t = localStorage.getItem('ids-theme');
+                if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            } catch (e) {}
+        })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🛡️ AI Cloud Security</div>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link {% if active_page == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="/predict" class="nav-link {% if active_page == 'predict' %}active{% endif %}">Predict</a></li>
+                <li><a href="/insights" class="nav-link {% if active_page == 'insights' %}active{% endif %}">Insights</a></li>
+                <li><a href="/history" class="nav-link {% if active_page == 'history' %}active{% endif %}">History</a></li>
+                <li><a href="/learn" class="nav-link {% if active_page == 'learn' %}active{% endif %}">Learn</a></li>
+                <li><a href="/about" class="nav-link {% if active_page == 'about' %}active{% endif %}">About</a></li>
+                <li>
+                    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Toggle theme">
+                        <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025–26 Matrusri Engineering College · Batch C-12</p>
+    </footer>
+
+    <!-- Toast container -->
+    <div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

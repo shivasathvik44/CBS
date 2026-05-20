@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}About - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">About This Project</h2>
+
+        <!-- Project Overview -->
+        <div class="card project-card">
+            <h3>Project Overview</h3>
+            <p>
+                <strong>AI-Based Intrusion Detection System for Cloud Networks</strong> is a mini project 
+                developed as part of the curriculum on "AI for Improving Security for Cloud Networks" at 
+                Matrusri Engineering College. This system demonstrates how machine learning can be applied 
+                to network security problems, specifically identifying malicious network traffic patterns.
+            </p>
+            <p style="margin-top: 12px;">
+                The project combines data science, cloud security concepts, and web application development 
+                to create a practical tool that securely analyzes network connections and detects intrusion attempts 
+                using a trained Random Forest model on the NSL-KDD benchmark dataset.
+            </p>
+        </div>
+
+        <!-- Team Information -->
+        <div class="card">
+            <h3>Project Team</h3>
+            <table class="team-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Roll Number</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>1608-23-733-191</td>
+                        <td>T.V. Sri Moukthika</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>1608-23-733-135</td>
+                        <td>P. Shiva Sathvik</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>1608-23-733-181</td>
+                        <td>G. Surakshitha</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 16px; padding: 12px; background: rgba(56,189,248,0.1); border-radius: 8px;">
+                <strong>Faculty Guide:</strong> P. Siva, Assistant Professor
+            </div>
+        </div>
+
+        <!-- Technical Stack -->
+        <div class="card">
+            <h3>Technology Stack</h3>
+            <table class="tech-table">
+                <tbody>
+                    <tr>
+                        <td><strong>Language</strong></td>
+                        <td>Python 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backend Framework</strong></td>
+                        <td>Flask</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ML Library</strong></td>
+                        <td>Scikit-learn</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ML Algorithm</strong></td>
+                        <td>Random Forest Classifier</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dataset</strong></td>
+                        <td>NSL-KDD (Benchmark)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frontend</strong></td>
+                        <td>HTML5 + CSS3 + Vanilla JavaScript</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Visualization</strong></td>
+                        <td>Chart.js</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment</strong></td>
+                        <td>Local Flask server (expandable to cloud)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Future Scope -->
+        <div class="card">
+            <h3>Future Scope & Enhancements</h3>
+            <div class="future-grid">
+                <div class="future-card">
+                    <div class="future-icon">☁️</div>
+                    <div class="future-title">AWS VPC Flow Logs</div>
+                    <p>Live integration with AWS VPC Flow Logs for real-time cloud traffic analysis</p>
+                </div>
+                <div class="future-card">
+                    <div class="future-icon">🎯</div>
+                    <div class="future-title">Multi-class Classification</div>
+                    <p>Predict specific attack type (DoS, Probe, R2L, U2R) instead of binary classification</p>
+                </div>
+                <div class="future-card">
+                    <div class="future-icon">📬</div>
+                    <div class="future-title">Alerting System</div>
+                    <p>Automated email and SMS alerts when high-severity attacks are detected</p>
+                </div>
+                <div class="future-card">
+                    <div class="future-icon">🚀</div>
+                    <div class="future-title">Cloud Deployment</div>
+                    <p>Deploy on AWS, Azure, or GCP as a containerized microservice</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- References -->
+        <div class="card">
+            <h3>References & Resources</h3>
+            <ul class="references-list">
+                <li>
+                    <strong>NSL-KDD Dataset:</strong> University of New Brunswick
+                    <br><small>A refined version of the original KDD'99 intrusion detection dataset</small>
+                </li>
+                <li>
+                    <strong>Scikit-learn Documentation:</strong> https://scikit-learn.org/
+                    <br><small>Machine learning library for Python</small>
+                </li>
+                <li>
+                    <strong>Flask Documentation:</strong> https://flask.palletsprojects.com/
+                    <br><small>Web application framework for Python</small>
+                </li>
+                <li>
+                    <strong>Chart.js Documentation:</strong> https://www.chartjs.org/
+                    <br><small>JavaScript library for data visualization</small>
+                </li>
+                <li>
+                    <strong>Random Forest Classifier:</strong> Breiman, L. (2001)
+                    <br><small>"Random Forests" Machine Learning, 45(1): 5-32</small>
+                </li>
+                <li>
+                    <strong>Intrusion Detection Systems:</strong> Scarfone, K. & Mell, P. (NIST)
+                    <br><small>Guide to Intrusion Detection and Prevention Systems (IDPS)</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Institution Info -->
+        <div class="card institution-card">
+            <h3>Matrusri Engineering College</h3>
+            <div style="text-align: center; padding: 16px;">
+                <p><strong>Batch:</strong> C-12, 2025-26</p>
+                <p><strong>Course:</strong> AI for Improving Security for Cloud Networks</p>
+                <p><strong>Project Type:</strong> Mini Project</p>
+                <p style="margin-top: 16px; font-size: 0.95em; color: #94a3b8;">
+                    © 2025–26 Matrusri Engineering College. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.references-list {
+    list-style: none;
+    padding: 0;
+}
+
+.references-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(56,189,248,0.1);
+}
+
+.references-list li:last-child {
+    border-bottom: none;
+}
+
+.references-list strong {
+    color: #38bdf8;
+}
+
+.references-list small {
+    display: block;
+    margin-top: 4px;
+    color: #94a3b8;
+}
+
+.institution-card {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(168,85,247,0.1) 100%);
+}
+</style>
+{% endblock %}

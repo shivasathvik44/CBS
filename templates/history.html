@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}History - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Prediction History</h2>
+
+        <div class="card">
+            <h3>Attack rate over time</h3>
+            <div class="chart-container">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Recent runs</h3>
+            <div id="historyEmpty" class="performance-note" style="display:none;">
+                <p>No predictions yet. Upload a file on the <a href="/predict" class="nav-link">Predict</a> page to see runs here.</p>
+            </div>
+            <div id="historyError" class="alert-box danger" style="display:none;">
+                <strong>Could not load history.</strong>
+                <p>Check the server logs and reload this page.</p>
+            </div>
+            <div class="table-wrapper">
+                <table class="predictions-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>When</th>
+                            <th>File</th>
+                            <th>Total</th>
+                            <th>Attacks</th>
+                            <th>Rate</th>
+                            <th>Avg conf.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

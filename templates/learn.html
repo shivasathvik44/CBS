@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Learn - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">How Does AI-Based IDS Work?</h2>
+
+        <!-- What is an IDS? -->
+        <div class="card learn-card">
+            <h3>What is an Intrusion Detection System?</h3>
+            <p>
+                An Intrusion Detection System (IDS) monitors network traffic and automatically flags suspicious 
+                connections before they cause damage. Instead of relying on static rules, our system uses 
+                <strong>Artificial Intelligence</strong> to recognize attack patterns from historical data.
+            </p>
+            <p>
+                Think of it as a security guard who has seen thousands of attempted break-ins and learned 
+                to spot the warning signs, making split-second decisions about what is normal and what is suspicious.
+            </p>
+        </div>
+
+        <!-- Why AI for Cloud Security? -->
+        <div class="card learn-card">
+            <h3>Why AI for Cloud Network Security?</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="comparison-title">❌ Old Way (Static Rules)</div>
+                    <ul>
+                        <li>Fixed, manual rules</li>
+                        <li>Misses new attack variations</li>
+                        <li>No confidence scores</li>
+                        <li>Manual updates needed</li>
+                        <li>Doesn't learn from data</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-title">✅ Our Way (AI-Powered)</div>
+                    <ul>
+                        <li>Learns from thousands of examples</li>
+                        <li>Generalizes to new attacks</li>
+                        <li>Provides confidence scores</li>
+                        <li>Trained once, works always</li>
+                        <li>Adapts to patterns in data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- What is NSL-KDD? -->
+        <div class="card learn-card">
+            <h3>What is the NSL-KDD Dataset?</h3>
+            <p>
+                NSL-KDD is a publicly available benchmark dataset from the University of New Brunswick. 
+                It contains <strong>thousands of recorded network connections</strong> — each already labelled 
+                as either <strong>Normal</strong> or a specific attack type.
+            </p>
+            <p>
+                Each connection is represented by <strong>41 features</strong> such as:
+            </p>
+            <div style="margin-top: 12px; padding: 12px; background: rgba(56,189,248,0.1); border-radius: 8px;">
+                <strong>Network Features:</strong> source bytes, destination bytes, duration, protocol type, service<br>
+                <strong>Basic Features:</strong> number of failed logins, logged in status, root shell attempts<br>
+                <strong>Traffic Features:</strong> connection error rates, same service rate, host connection count
+            </div>
+            <p style="margin-top: 12px;">
+                We train our AI on this data so it learns what attacks look like and can predict new traffic accurately.
+            </p>
+        </div>
+
+        <!-- How Random Forest Works -->
+        <div class="card learn-card">
+            <h3>How Does Random Forest Work?</h3>
+            <p>Random Forest is an ensemble method that works like a jury making decisions:</p>
+            
+            <div class="forest-visualization">
+                <div class="forest-row">
+                    <div class="forest-tree">
+                        <div class="tree-icon">🌲</div>
+                        <div class="tree-label">Tree 1</div>
+                    </div>
+                    <div class="forest-tree">
+                        <div class="tree-icon">🌲</div>
+                        <div class="tree-label">Tree 2</div>
+                    </div>
+                    <div class="forest-tree">
+                        <div class="tree-icon">🌲</div>
+                        <div class="tree-label">Tree 3</div>
+                    </div>
+                    <div style="text-align: center; font-size: 2em;">...</div>
+                    <div class="forest-tree">
+                        <div class="tree-icon">🌲</div>
+                        <div class="tree-label">Tree 100</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 24px; font-size: 1.2em; color: #38bdf8;">
+                    ⬇️ Each tree votes: Attack or Normal?
+                </div>
+                <div style="text-align: center; margin-top: 16px; padding: 16px; background: rgba(56,189,248,0.1); border-radius: 8px;">
+                    <strong>Majority Vote = Final Decision</strong>
+                </div>
+            </div>
+            
+            <p style="margin-top: 16px;">
+                We train 100 independent decision trees on random subsets of the data. Each tree makes a prediction, 
+                and the final decision is based on a <strong>majority vote</strong>. This ensemble approach is robust 
+                and handles complex patterns better than a single tree.
+            </p>
+        </div>
+
+        <!-- Existing Tools Comparison -->
+        <div class="card learn-card">
+            <h3>How We Compare to Existing Tools</h3>
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>CloudSploit</th>
+                            <th>Prowler</th>
+                            <th>ScoutSuite</th>
+                            <th>Our IDS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Real-time Detection</strong></td>
+                            <td>❌ Compliance checks</td>
+                            <td>❌ Compliance checks</td>
+                            <td>❌ Compliance checks</td>
+                            <td>✅ Real-time network analysis</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI-Powered</strong></td>
+                            <td>❌ Rule-based</td>
+                            <td>❌ Rule-based</td>
+                            <td>❌ Rule-based</td>
+                            <td>✅ Machine learning</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Visual Dashboard</strong></td>
+                            <td>✅ Limited</td>
+                            <td>✅ Limited</td>
+                            <td>✅ Limited</td>
+                            <td>✅ Interactive charts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Network Attack Detection</strong></td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>✅ DoS, Probe, R2L, U2R</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confidence Scores</strong></td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>✅ Per-prediction</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NSL-KDD Trained</strong></td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td>✅ Yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Attack Types Explained -->
+        <div class="card learn-card">
+            <h3>What Are These Attack Types?</h3>
+            <div class="attacks-grid">
+                <div class="attack-item">
+                    <div class="attack-name">DoS (Denial of Service)</div>
+                    <p>Attacker overwhelms a service with traffic to make it unavailable. Examples: SYN flood, UDP flood, Smurf attacks.</p>
+                </div>
+                <div class="attack-item">
+                    <div class="attack-name">Probe (Reconnaissance)</div>
+                    <p>Attacker scans the network to find open ports and services. Examples: Port scanning (Nmap), IP sweep.</p>
+                </div>
+                <div class="attack-item">
+                    <div class="attack-name">R2L (Remote to Local)</div>
+                    <p>Attacker tries to gain local access from a remote machine. Examples: Password guessing, FTP brute force.</p>
+                </div>
+                <div class="attack-item">
+                    <div class="attack-name">U2R (User to Root)</div>
+                    <p>Attacker exploits vulnerabilities to gain root/admin privileges. Examples: Buffer overflow, privilege escalation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

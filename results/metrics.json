@@ -1,0 +1,129 @@
+{
+  "accuracy": 88.42,
+  "precision": 85.0,
+  "recall": 96.73,
+  "f1": 90.49,
+  "roc_auc": 95.86,
+  "threshold": 0.0298,
+  "threshold_f1_max": 0.0305,
+  "precision_floor": 0.85,
+  "confusion_matrix": {
+    "tn": 7521,
+    "fp": 2190,
+    "fn": 420,
+    "tp": 12413
+  },
+  "per_class": {
+    "Normal": {
+      "precision": 96.2,
+      "recall": 76.05,
+      "f1": 84.95,
+      "support": 7458
+    },
+    "DoS": {
+      "precision": 68.21,
+      "recall": 96.86,
+      "f1": 80.05,
+      "support": 9711
+    },
+    "Probe": {
+      "precision": 81.18,
+      "recall": 76.25,
+      "f1": 78.64,
+      "support": 2421
+    },
+    "R2L": {
+      "precision": 96.68,
+      "recall": 17.97,
+      "f1": 30.31,
+      "support": 2754
+    },
+    "U2R": {
+      "precision": 38.36,
+      "recall": 14.0,
+      "f1": 20.51,
+      "support": 200
+    }
+  },
+  "top_features": [
+    {
+      "name": "dst_host_srv_count",
+      "importance": 0.114533
+    },
+    {
+      "name": "logged_in",
+      "importance": 0.083056
+    },
+    {
+      "name": "service",
+      "importance": 0.06505
+    },
+    {
+      "name": "dst_host_same_src_port_rate",
+      "importance": 0.06469
+    },
+    {
+      "name": "root_shell",
+      "importance": 0.060459
+    },
+    {
+      "name": "dst_host_serror_rate",
+      "importance": 0.042483
+    },
+    {
+      "name": "same_srv_rate",
+      "importance": 0.040004
+    },
+    {
+      "name": "dst_host_count",
+      "importance": 0.037878
+    },
+    {
+      "name": "srv_serror_rate",
+      "importance": 0.03718
+    },
+    {
+      "name": "protocol_type",
+      "importance": 0.036324
+    }
+  ],
+  "model_params": {
+    "algorithm": "Extra Trees",
+    "n_estimators": 150,
+    "max_depth": 30,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "model_name": "extra_trees",
+  "candidate_scores": {
+    "random_forest": 0.4865,
+    "extra_trees": 0.5889,
+    "gradient_boosting": 0.5225,
+    "ensemble": 0.5156
+  },
+  "cv": {
+    "accuracy": {
+      "mean": 0.9987,
+      "std": 0.0001
+    },
+    "precision_macro": {
+      "mean": 0.9738,
+      "std": 0.032
+    },
+    "recall_macro": {
+      "mean": 0.8933,
+      "std": 0.0355
+    },
+    "f1_macro": {
+      "mean": 0.9188,
+      "std": 0.0296
+    }
+  },
+  "classes": [
+    "Normal",
+    "DoS",
+    "Probe",
+    "R2L",
+    "U2R"
+  ]
+}

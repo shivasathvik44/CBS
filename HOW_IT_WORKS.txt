@@ -1,0 +1,283 @@
+================================================================================
+AI-BASED INTRUSION DETECTION SYSTEM  —  HOW IT WORKS
+================================================================================
+
+This is a Flask web app that uses a machine-learning model trained on the
+NSL-KDD network-traffic dataset to flag malicious connections. You upload a
+file of connection records and the system tells you, row by row, whether each
+one looks like normal traffic or an attack (and what kind of attack).
+
+
+--------------------------------------------------------------------------------
+1.  PROJECT LAYOUT
+--------------------------------------------------------------------------------
+
+IDS_NEW/
+  app.py                Flask server: page routes + JSON APIs
+  train.py              Trains the model end-to-end on NSL-KDD
+  features.py           Shared constants (41 feature names, attack-->category map)
+  db.py                 SQLite prediction-history persistence (stdlib only)
+  requirements.txt      Flask, pandas, numpy, scikit-learn, Werkzeug
+  data/
+    KDDTrain+.txt       Full NSL-KDD training set (~126k rows)
+    KDDTest+.txt        Full NSL-KDD test set     (~22.5k rows)
+    sample_test.csv     Small 100-row demo sample (balanced across 5 classes)
+    history.db          (auto-created) SQLite store of past prediction runs
+  models/               (auto-created by train.py) pickled artifacts
+    model.pkl, scaler.pkl, encoders.pkl,
+    columns.pkl, threshold.pkl, label_encoder.pkl
+  results/              (auto-created by train.py)
+    metrics.json        Real metrics the Insights page reads at runtime
+    report.txt          Human-readable training report
+  templates/            Jinja2 HTML pages
+    base.html, index.html, predict.html, insights.html,
+    history.html, learn.html, about.html
+  static/
+    css/style.css       Styling (CSS variables + light/dark theme)
+    js/
+      ui.js             Shared toast + theme-toggle helpers
+      predict.js        File upload + results rendering
+      insights.js       Loads /api/insights and renders metrics
+      history.js        Loads /api/history and draws the trend chart
+
+
+--------------------------------------------------------------------------------
+2.  THE DATASET (NSL-KDD)
+--------------------------------------------------------------------------------
+
+Every row in KDDTrain+.txt / KDDTest+.txt describes one TCP/UDP/ICMP
+connection using 41 features. They split into three groups:
+
+  *  Basic features          duration, protocol_type, service, flag,
+                             src_bytes, dst_bytes, land, wrong_fragment, urgent
+
+  *  Content features        hot, num_failed_logins, logged_in,
+                             num_compromised, root_shell, su_attempted,
+                             num_root, num_file_creations, num_shells,
+                             num_access_files, num_outbound_cmds,
+                             is_host_login, is_guest_login
+
+  *  Traffic features        count, srv_count, *_serror_rate, *_rerror_rate,
+                             same_srv_rate, diff_srv_rate, srv_diff_host_rate,
+                             dst_host_*  (time-window and host-window
+                                          statistics over the last 100 conns)
+
+Three of those features are CATEGORICAL strings (protocol_type, service,
+flag); the rest are numeric. The label column says what kind of connection
+it is: "normal" or one of 30+ attack names (neptune, smurf, satan,
+guess_passwd, buffer_overflow, ...).
+
+We map each raw attack name to one of FIVE categories (features.py):
+
+      Normal   -- legitimate traffic
+      DoS      -- denial of service     (neptune, smurf, pod, teardrop, ...)
+      Probe    -- surveillance/scanning (nmap, satan, portsweep, ipsweep, ...)
+      R2L      -- remote to local       (guess_passwd, ftp_write, warezclient,...)
+      U2R      -- user to root          (buffer_overflow, rootkit, perl, ...)
+
+
+--------------------------------------------------------------------------------
+3.  TRAINING PIPELINE  (train.py)
+--------------------------------------------------------------------------------
+
+Run once:    python train.py
+
+Step 1 - Load KDDTrain+.txt and KDDTest+.txt.
+Step 2 - Map raw attack labels to the 5 categories above.
+Step 3 - Encode protocol_type / service / flag with LabelEncoder.
+         Encoders are fit on the UNION of train+test values, so unseen
+         test-set categories don't crash the pipeline.
+         Standard-scale all 41 numeric features.
+Step 4 - 5-fold stratified cross-validation on the training set (RF probe).
+         Gives the mean +/- std for accuracy / precision / recall / F1
+         that the Insights page later displays.
+Step 5 - Train three candidate models on the full training set:
+            * RandomForestClassifier      (150 trees, class_weight=balanced)
+            * ExtraTreesClassifier        (150 trees, class_weight=balanced)
+            * GradientBoostingClassifier  (80 estimators)
+         Plus a soft-voting ensemble of the three.
+         Whichever has the best test macro-F1 is kept as models/model.pkl.
+Step 6 - Evaluate on the held-out test set and tune the binary
+         attack-vs-normal decision threshold.
+
+         WHY A SEPARATE BINARY THRESHOLD?
+         The model is multi-class (5 outputs) but the headline question for
+         an IDS is "is this an attack, yes or no?". We compute
+                attack_proba = 1 - P(Normal)
+         then pick the LOWEST threshold whose precision is still >= 85%.
+         This deliberately trades a few false alarms for many fewer missed
+         attacks (false negatives are worse than false positives in security).
+
+Step 7 - Save artifacts:
+            models/model.pkl              the chosen classifier
+            models/scaler.pkl             StandardScaler
+            models/encoders.pkl           LabelEncoders for the 3 categorical cols
+            models/columns.pkl            ordered feature names
+            models/threshold.pkl          recall-priority binary threshold
+            models/label_encoder.pkl      maps 0..4 -> [Normal,DoS,Probe,R2L,U2R]
+            results/metrics.json          machine-readable, drives the UI
+            results/report.txt            human-readable summary
+
+Why these particular models?
+  - Random Forest and ExtraTrees are tree ensembles -- robust to scale,
+    handle mixed numeric/categorical, and give free feature importances.
+  - GradientBoosting often catches subtle patterns the bagging ensembles
+    miss; including it lets the voting layer pick the best of both worlds.
+  - We compare them honestly on the test set and keep whichever wins by
+    macro-F1 (not plain accuracy, because the classes are very imbalanced).
+
+
+--------------------------------------------------------------------------------
+4.  PREDICTION FLOW  (app.py + predict.js)
+--------------------------------------------------------------------------------
+
+User opens /predict and drops a CSV/TXT file. The JavaScript posts it to
+POST /api/predict. The server:
+
+  1.  Reads the file with pandas. The file may have:
+         41 columns (features only)
+         42 columns (features + attack label)
+         43 columns (features + attack label + difficulty -- NSL-KDD format)
+      Extra columns are sliced off; the label, if present, is kept so we
+      can show the ground-truth attack category in the results table.
+
+  2.  Encodes the 3 categorical features using the SAME LabelEncoders that
+      were fit during training. Unseen values are mapped to the encoder's
+      first known class so they don't blow up.
+
+  3.  Scales features with the saved StandardScaler.
+
+  4.  Calls model.predict_proba(X)  ->  shape (n_rows, 5).
+      For each row:
+          *  attack_proba   = 1 - P(Normal)
+          *  is_attack      = attack_proba >= saved_threshold
+          *  category       = argmax over the 5 classes (if the threshold
+                              flips a "Normal" prediction to "Attack", we
+                              pick the next-best non-Normal class for the
+                              category name)
+          *  confidence     = probability of the chosen verdict, in %
+          *  severity       = Safe  (normal traffic)
+                              Low   (attack, confidence < 70%)
+                              Medium(attack, 70% <= conf < 90%)
+                              High  (attack, conf >= 90%)
+
+  5.  Builds a summary JSON (counts, average confidence, category and
+      severity histograms, per-row results) and returns it.
+
+  6.  Persists the summary (NOT the per-row results) to data/history.db
+      via db.save_prediction(). The /history page reads these back later.
+
+The browser then renders:
+  - 4 headline cards (total / normal / attack / avg confidence)
+  - A severity breakdown (High / Medium / Low)
+  - Two charts: doughnut (normal vs attack) and bar (attacks by category)
+  - A paginated, searchable table of every row's verdict
+  - A toast notification summarising the result
+  - A CSV download button
+
+
+--------------------------------------------------------------------------------
+5.  INSIGHTS PAGE  (/insights)
+--------------------------------------------------------------------------------
+
+This page used to display hardcoded numbers. Now /api/insights returns the
+contents of results/metrics.json verbatim, so whatever train.py wrote on
+its last run is what the page shows:
+
+  - Accuracy / Precision / Recall / F1 / ROC-AUC for the binary view
+  - The exact confusion matrix (TN / FP / FN / TP) at the saved threshold
+  - Per-class precision / recall / F1 / support for the 5-way classifier
+  - 5-fold cross-validation mean +/- std
+  - Macro-F1 for each candidate model (so you can see which one was picked)
+  - The full model parameter set (algorithm, trees, max depth, etc.)
+  - The top 10 most important features, with a horizontal bar chart
+
+
+--------------------------------------------------------------------------------
+6.  HISTORY PAGE  (/history)
+--------------------------------------------------------------------------------
+
+Every prediction run inserts a row into the predictions table in
+data/history.db (SQLite, Python stdlib -- no new dependency). The page
+loads /api/history and shows:
+
+  - A line chart of attack rate (%) over time
+  - A table of recent runs (timestamp, filename, totals, attack rate,
+    average confidence)
+
+
+--------------------------------------------------------------------------------
+7.  HOW TO TRY IT
+--------------------------------------------------------------------------------
+
+   1.  pip install -r requirements.txt
+   2.  python train.py            (one time -- generates models/ and results/)
+   3.  python app.py              (or:  set FLASK_DEBUG=1  and then python app.py)
+   4.  Open http://localhost:5000
+
+   5.  Click "Predict" in the nav bar.
+   6.  Upload data/sample_test.csv (the 100-row demo file).
+       Expected outcome:
+          - About 80 rows flagged as Attack, 20 as Normal.
+          - Categories spread across DoS / Probe / R2L / U2R.
+          - A toast notification summarising the result.
+   7.  Click "Insights" to see real metrics from your last training run.
+   8.  Click "History" to see the run you just did appear in the table
+       and on the attack-rate-over-time chart.
+   9.  Click the moon / sun button in the nav bar to switch theme.
+
+
+--------------------------------------------------------------------------------
+8.  WHY THE DESIGN CHOICES?
+--------------------------------------------------------------------------------
+
+*  RECALL-PRIORITY THRESHOLD.  In intrusion detection a false negative
+   (missed attack) usually costs much more than a false positive (alarm on
+   a benign connection that an analyst can dismiss). We tune the threshold
+   for the highest recall achievable while keeping precision at or above
+   85% -- a deliberate, defensible trade-off.
+
+*  MULTI-CLASS, NOT JUST BINARY.  Knowing "this is a DoS" vs "this is a
+   privilege-escalation attempt" matters for incident response. The model
+   outputs all 5 classes; the binary attack-vs-normal verdict is a derived
+   view on top.
+
+*  CLASS_WEIGHT=BALANCED.  NSL-KDD is heavily imbalanced (Normal and DoS
+   dominate, U2R has only 52 training rows). Balanced class weights
+   prevent the tree ensembles from collapsing onto the majority class.
+
+*  STRATIFIED CV.  Same reason -- a non-stratified split would put zero or
+   one U2R example in some folds, breaking the per-class metrics.
+
+*  ONE FEATURE LIST, ONE PLACE.  features.py is imported by both train.py
+   and app.py so the 41-feature schema and the attack-->category map can
+   never drift between the trainer and the inference server.
+
+*  NO NEW DEPENDENCIES.  Everything above is built on the existing
+   Flask / pandas / numpy / scikit-learn / Werkzeug stack plus Python
+   stdlib (json, sqlite3, datetime, os, pickle, warnings). No XGBoost, no
+   SQLAlchemy, no Flask-Login -- the project still runs from a clean
+   requirements.txt install.
+
+
+--------------------------------------------------------------------------------
+9.  LIMITATIONS WORTH KNOWING
+--------------------------------------------------------------------------------
+
+*  NSL-KDD is a 1999-era research dataset. The model knows the attack
+   families in NSL-KDD; modern attacks (ransomware C2, cloud token theft,
+   container escapes) are not represented and would need a newer dataset
+   like CICIDS-2018 to recognise.
+
+*  R2L and U2R recall is inherently low because there are very few
+   training examples (52 U2R rows total). The metrics page shows this
+   honestly via per-class precision / recall.
+
+*  The /api/predict endpoint has no authentication and runs the Flask
+   development server. Fine for a local demo, not appropriate as-is for
+   public deployment.
+
+*  Pickle files are convenient but unsafe if loaded from an untrusted
+   source. Treat models/*.pkl as trusted code, not data.
+
+================================================================================

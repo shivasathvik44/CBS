@@ -1,0 +1,44 @@
+AI-BASED INTRUSION DETECTION SYSTEM
+Training Report — NSL-KDD (2026-05-19T22:35:10)
+================================================================================
+Selected model:  extra_trees
+
+BINARY METRICS (attack vs normal, recall-priority threshold)
+  threshold        = 0.0298  (precision floor 0.85)
+  accuracy         = 88.42%
+  precision        = 85.00%
+  recall           = 96.73%
+  f1               = 90.49%
+  roc_auc          = 95.86%
+  confusion matrix = tn=7521  fp=2190  fn=420  tp=12413
+
+CANDIDATE F1-macro (test set):
+  random_forest        0.4865
+  extra_trees          0.5889
+  gradient_boosting    0.5225
+  ensemble             0.5156
+
+PER-CLASS METRICS (test set, multi-class):
+  Normal    precision=96.20%  recall=76.05%  f1=84.95%  support=7458
+  DoS       precision=68.21%  recall=96.86%  f1=80.05%  support=9711
+  Probe     precision=81.18%  recall=76.25%  f1=78.64%  support=2421
+  R2L       precision=96.68%  recall=17.97%  f1=30.31%  support=2754
+  U2R       precision=38.36%  recall=14.00%  f1=20.51%  support=200
+
+CROSS-VALIDATION (5-fold stratified, training set, RF probe):
+  accuracy           mean=0.9987  std=0.0001
+  precision_macro    mean=0.9738  std=0.0320
+  recall_macro       mean=0.8933  std=0.0355
+  f1_macro           mean=0.9188  std=0.0296
+
+TOP FEATURES:
+  dst_host_srv_count             0.114533
+  logged_in                      0.083056
+  service                        0.065050
+  dst_host_same_src_port_rate    0.064690
+  root_shell                     0.060459
+  dst_host_serror_rate           0.042483
+  same_srv_rate                  0.040004
+  dst_host_count                 0.037878
+  srv_serror_rate                0.037180
+  protocol_type                  0.036324

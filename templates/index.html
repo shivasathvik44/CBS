@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">AI Cloud Security</h1>
+        <p class="hero-subtitle">Intrusion Detection System for Cloud Networks — Powered by Random Forest</p>
+        
+        <div id="modelStatus" class="status-badge">
+            <span class="status-dot"></span>
+            <span class="status-text">Loading...</span>
+        </div>
+        
+        <div class="hero-buttons">
+            <a href="/predict" class="btn btn-primary">Analyse Traffic →</a>
+            <a href="/insights" class="btn btn-secondary">View Insights</a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">📥</div>
+                <div class="step-title">Load</div>
+                <p>Upload NSL-KDD format traffic file</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">⚙️</div>
+                <div class="step-title">Process</div>
+                <p>Features encoded and normalised</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">🤖</div>
+                <div class="step-title">Detect</div>
+                <p>Random Forest analyses each connection</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">📊</div>
+                <div class="step-title">Report</div>
+                <p>Results shown with charts and severity</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Attack Categories -->
+<section class="section bg-alt">
+    <div class="container">
+        <h2 class="section-title">Attack Categories</h2>
+        <div class="categories-grid">
+            <div class="category-card" style="--color: #22c55e;">
+                <div class="category-icon">✓</div>
+                <div class="category-name">Normal</div>
+                <p>Legitimate network traffic</p>
+            </div>
+            <div class="category-card" style="--color: #ef4444;">
+                <div class="category-icon">💥</div>
+                <div class="category-name">DoS</div>
+                <p>Flood and crash service</p>
+            </div>
+            <div class="category-card" style="--color: #f97316;">
+                <div class="category-icon">🔍</div>
+                <div class="category-name">Probe</div>
+                <p>Network scanning</p>
+            </div>
+            <div class="category-card" style="--color: #a855f7;">
+                <div class="category-icon">🚪</div>
+                <div class="category-name">R2L</div>
+                <p>Remote to local attempts</p>
+            </div>
+            <div class="category-card" style="--color: #ec4899;">
+                <div class="category-icon">👑</div>
+                <div class="category-name">U2R</div>
+                <p>Privilege escalation</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Model Info -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Model Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Algorithm</div>
+                <div class="info-value">Random Forest (100 trees)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Dataset</div>
+                <div class="info-value">NSL-KDD Benchmark</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Task</div>
+                <div class="info-value">Binary: Normal vs Attack</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Accuracy</div>
+                <div class="info-value">77.88%</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Precision</div>
+                <div class="info-value">96.81%</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">ROC-AUC</div>
+                <div class="info-value">96.19%</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check model status
+    fetch('/api/status')
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById('modelStatus');
+            if (data.ready) {
+                badge.innerHTML = '<span class="status-dot ready"></span><span class="status-text">● Model Ready</span>';
+                badge.classList.add('ready');
+            } else {
+                badge.innerHTML = '<span class="status-dot error"></span><span class="status-text">● Model Error</span>';
+                badge.classList.add('error');
+            }
+        });
+});
+</script>
+{% endblock %}

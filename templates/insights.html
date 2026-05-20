@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Insights - AI Cloud Security IDS{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Model Performance Insights</h2>
+
+        <div id="insightsError" class="card error-card" style="display:none;">
+            <strong>Could not load insights.</strong>
+            <p>Make sure the model has been trained: <code>python train.py</code>.</p>
+        </div>
+
+        <!-- Metric Cards (binary attack-vs-normal at the recall-priority threshold) -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Accuracy</div>
+                <div class="metric-value" id="accuracyValue">—</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Precision</div>
+                <div class="metric-value" id="precisionValue">—</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Recall</div>
+                <div class="metric-value" id="recallValue">—</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">F1 Score</div>
+                <div class="metric-value" id="f1Value">—</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ROC-AUC</div>
+                <div class="metric-value" id="rocAucValue">—</div>
+            </div>
+        </div>
+
+        <div class="card performance-note">
+            <p id="performanceText" class="is-loading">Loading performance analysis…</p>
+        </div>
+
+        <div class="card chart-container">
+            <h3>Top 10 Important Features</h3>
+            <canvas id="featureChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h3>Confusion Matrix (attack vs normal)</h3>
+            <div class="confusion-matrix">
+                <div class="cm-row">
+                    <div class="cm-cell">
+                        <div class="cm-label">True Negatives</div>
+                        <div class="cm-value" id="tnValue">—</div>
+                    </div>
+                    <div class="cm-cell">
+                        <div class="cm-label">False Positives</div>
+                        <div class="cm-value" id="fpValue">—</div>
+                    </div>
+                </div>
+                <div class="cm-row">
+                    <div class="cm-cell">
+                        <div class="cm-label">False Negatives</div>
+                        <div class="cm-value" id="fnValue">—</div>
+                    </div>
+                    <div class="cm-cell">
+                        <div class="cm-label">True Positives</div>
+                        <div class="cm-value" id="tpValue">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="perClassCard">
+            <h3>Per-class metrics (multi-class)</h3>
+            <div class="table-wrapper">
+                <table class="predictions-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>Support</th>
+                        </tr>
+                    </thead>
+                    <tbody id="perClassBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Cross-validation (5-fold stratified)</h3>
+            <div class="params-grid" id="cvBlock"></div>
+        </div>
+
+        <div class="card">
+            <h3>Candidate models (macro-F1 on test)</h3>
+            <p>The starred model is the one selected and saved.</p>
+            <div class="params-grid" id="candidateBlock"></div>
+        </div>
+
+        <div class="card">
+            <h3>Model Parameters</h3>
+            <div class="params-grid">
+                <div class="param-item">
+                    <div class="param-key">Algorithm</div>
+                    <div class="param-value" id="paramAlgorithm">—</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-key">Trees / voting</div>
+                    <div class="param-value" id="paramTrees">—</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-key">Class Weight</div>
+                    <div class="param-value" id="paramClassWeight">—</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-key">Decision Threshold</div>
+                    <div class="param-value" id="paramThreshold">—</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-key">Max Depth</div>
+                    <div class="param-value" id="paramMaxDepth">—</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-key">Random State</div>
+                    <div class="param-value" id="paramRandomState">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/insights.js') }}"></script>
+{% endblock %}
